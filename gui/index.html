@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L.U.N.A. Interface</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Main Dashboard Layer -->
+    <div class="dashboard-grid">
+        <!-- Top Left Widget -->
+        <div class="widget-card top-left" id="widget-tl">
+            <h3>System Monitor</h3>
+            <div class="widget-content">
+                <p>CPU: <span id="cpu-load">--%</span></p>
+                <p>RAM: <span id="ram-usage">--%</span></p>
+                <p>BAT: <span id="bat-level">--%</span></p>
+            </div>
+        </div>
+
+        <!-- Top Right Widget -->
+        <div class="widget-card top-right" id="widget-tr">
+            <h3>Clock & Network</h3>
+            <div class="widget-content">
+                <h1 id="dashboard-clock">00:00</h1>
+                <p id="network-status">Local Engine Active</p>
+            </div>
+        </div>
+
+        <!-- Bottom Left Widget -->
+        <div class="widget-card bottom-left" id="widget-bl">
+            <h3>Productivity</h3>
+            <div class="widget-content">
+                <textarea id="scratchpad" placeholder="Luna's local scratchpad... Write thoughts or snippets here."></textarea>
+            </div>
+        </div>
+
+        <!-- Bottom Right Widget -->
+         <div class="widget-card bottom-right" id="widget-br">
+            <h3>System Terminal</h3>
+            <div class="terminal-container" style="display: flex; flex-direction: column; height: calc(100% - 30px); justify-content: space-between;">
+                <!-- Feed window locked to a fixed scrollable height inside the box boundaries -->
+                <div id="terminal-feed" style="flex-grow: 1; height: 130px; overflow-y: auto; margin-bottom: 10px;">Luna: Command dispatcher structure online, sir.</div>
+                
+                <!-- Input field line cleanly nested inside the card border lines -->
+                <div class="terminal-input-wrapper" style="display: flex; align-items: center; border-top: 1px solid var(--border-low-opacity); padding-top: 10px; background: transparent;">
+                    <span style="color: #38bdf8; margin-right: 8px; font-family: monospace; font-weight: bold;">$</span>
+                    <input type="text" id="terminal-input-box" placeholder="Issue a utility command..." style="width: 100%; background: transparent; border: none; outline: none; color: #ffffff; font-family: monospace; font-size: 0.85rem;" />
+                </div>
+            </div>
+        </div>
+
+
+    <!-- Center Luna Orb Layer (Sits on top of the grid) -->
+    <div class="luna-center-container">
+        
+        <div class="luna-moon state-idle" id="luna-core">
+            <div class="crescent-mask"></div>
+        </div>
+        <div class="luna-label">L.U.N.A.</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
