@@ -1,0 +1,1 @@
+Need to work on speech to text for commands for the system terminal

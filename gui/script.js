@@ -30,7 +30,7 @@ function setupMoonInteraction() {
             moonCore.classList.remove('state-listening');
             moonCore.classList.add('state-idle');
 
-            terminalFeed.innerHTML += `<br>[${timeNow}] <span style="color: var(--card-slate-shadow);">Luna:</span> Standing by, sir.`;
+            terminalFeed.innerHTML += `<br>[${timeNow}] <span style="color: var(--card-slate-shadow);">Luna:</span> Standing by, ma'am.`;
         }
 
         // Automatically scroll the terminal feed to the bottom so logs stay visible

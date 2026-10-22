@@ -21,7 +21,7 @@ import threading
 class LunaAPI:
     def send_to_terminal(self, text):
         print(f"[UI Log]: {text}")
-        return "Acknowledged, sir."
+        return "Acknowledged, ma'am."
 
     def save_scratchpad(self, content):
         try:
