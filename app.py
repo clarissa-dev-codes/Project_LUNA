@@ -1,9 +1,9 @@
 import os
 import sys
-import platform  # ✨ NEW: Detects if we are running on Windows or Linux
+import platform  # Detects if we are running on Windows or Linux
 import subprocess
 
-# 🌟 MULTI-PLATFORM ENVIRONMENTAL HANDLING
+# MULTI-PLATFORM ENVIRONMENTAL HANDLING
 CURRENT_OS = platform.system().lower()  # Returns 'windows' or 'linux'
 
 if CURRENT_OS == 'linux':
@@ -41,7 +41,7 @@ class LunaAPI:
             return ""
 
     # ─────────────────────────────────────────────────────────
-    # ⚙️ UNIVERSAL CROSS-PLATFORM ACTION MATRIX
+    # UNIVERSAL CROSS-PLATFORM ACTION MATRIX
     # ─────────────────────────────────────────────────────────
     def execute_ui_command(self, raw_command):
         cmd = raw_command.lower().strip()
