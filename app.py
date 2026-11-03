@@ -1,6 +1,6 @@
 import os
 import sys
-import platform  # Detects if we are running on Windows or Linux
+import platform  # NEW: Detects if we are running on Windows or Linux
 import subprocess
 
 # MULTI-PLATFORM ENVIRONMENTAL HANDLING
@@ -41,7 +41,7 @@ class LunaAPI:
             return ""
 
     # ─────────────────────────────────────────────────────────
-    # UNIVERSAL CROSS-PLATFORM ACTION MATRIX
+    #  UNIVERSAL CROSS-PLATFORM ACTION MATRIX
     # ─────────────────────────────────────────────────────────
     def execute_ui_command(self, raw_command):
         cmd = raw_command.lower().strip()
@@ -86,9 +86,31 @@ class LunaAPI:
                 else:
                     # 1. Safely attenuate the background audio track by 10%
                     subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
-                    # 2. ✨ Pushes the native floating notification bubble onto your desktop
+                    # 2.  Pushes the native floating notification bubble onto your desktop
                     subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
                 return {"status": "success", "msg": "Master speaker matrix attenuated."}
+
+            elif "mute volume" in cmd:
+                            if CURRENT_OS == "windows":
+                                import ctypes
+                                ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)
+                        #    else:
+                                # 1. Safely attenuate the background audio track by 10%
+                        #        subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
+                                # 2. Pushes the native floating notification bubble onto your desktop
+                        #      subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
+                            return {"status": "success", "msg": "Master speaker muted."}
+
+            elif "unmute volume" in cmd:
+                            if CURRENT_OS == "windows":
+                                import ctypes
+                                ctypes.windll.user32.keybd_event(0xAD, 0, 2, 0)
+                            #    else:
+                                # 1. Safely attenuate the background audio track by 10%
+                            #        subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
+                                # 2.  Pushes the native floating notification bubble onto your desktop
+                            #      subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
+                                return {"status": "success", "msg": "Master speaker unmuted."}            
 
                 
             elif "lock system" in cmd or "lock screen" in cmd:
