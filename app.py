@@ -94,8 +94,8 @@ class LunaAPI:
                     subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
                 return {"status": "success", "msg": "Master speaker matrix attenuated."}
 
-                
             elif "lock system" in cmd or "lock screen" in cmd:
+
                 if CURRENT_OS == "windows":
                     import ctypes
                     ctypes.windll.user32.LockWorkStation()
