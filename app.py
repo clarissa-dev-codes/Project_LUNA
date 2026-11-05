@@ -3,14 +3,23 @@ import sys
 import platform  # Detects if we are running on Windows or Linux
 import subprocess
 
-# MULTI-PLATFORM ENVIRONMENTAL HANDLING
+# ─────────────────────────────────────────────────────────
+#  MULTI-PLATFORM ENVIRONMENTAL SANITIZATION
+# ─────────────────────────────────────────────────────────
 CURRENT_OS = platform.system().lower()  # Returns 'windows' or 'linux'
 
 if CURRENT_OS == 'linux':
-    # Clean out leaked Snap paths if launching from a sandboxed tool on Ubuntu
+    # 1. Clean out leaked Snap paths entirely from the current context
     keys_to_purge = ['LD_PRELOAD', 'GTK_PATH', 'LD_LIBRARY_PATH', 'BASH_FUNC_which%%']
     for key in keys_to_purge:
         os.environ.pop(key, None)
+    
+    # 2. Prevent underlying subprocesses from inheriting polluted Snap libraries
+    if "PATH" in os.environ:
+        clean_paths = [p for p in os.environ["PATH"].split(':') if 'snap' not in p]
+        os.environ["PATH"] = ':'.join(clean_paths)
+        
+    # 3. Enforce the X11 engine backend to assist WebKit rendering
     os.environ['GDK_BACKEND'] = 'x11'
 
 import time
@@ -41,7 +50,7 @@ class LunaAPI:
             return ""
 
     # ─────────────────────────────────────────────────────────
-    # UNIVERSAL CROSS-PLATFORM ACTION MATRIX
+    #  UNIVERSAL CROSS-PLATFORM ACTION MATRIX
     # ─────────────────────────────────────────────────────────
     def execute_ui_command(self, raw_command):
         cmd = raw_command.lower().strip()
@@ -51,31 +60,26 @@ class LunaAPI:
             # 1. App Launcher Routing
             if "open browser" in cmd or "launch web" in cmd:
                 if CURRENT_OS == "windows":
-                    # Native Windows command to open default browser
                     os.system("start https://google.com")
                 else:
-                    # Native Linux command to open default browser
                     subprocess.Popen(["xdg-open", "https://google.com"])
                 return {"status": "success", "msg": "Default browser matrix active."}
                 
             elif "open code" in cmd or "launch vscode" in cmd:
                 if CURRENT_OS == "windows":
-                    # Launches VS Code on Windows via shell path
                     subprocess.Popen(["cmd", "/c", "code"], shell=True)
                 else:
                     subprocess.Popen(["code"])
                 return {"status": "success", "msg": "VS Code workspace opened."}
 
-            # 2. Hardware Control Routing (Universal Linux Audio Update)
+            # 2. Hardware Control Routing (Universal Audio Management)
             elif "volume up" in cmd:
                 if CURRENT_OS == "windows":
                     import ctypes
                     ctypes.windll.user32.keybd_event(0xAF, 0, 0, 0)
                 else:
-                    # 1. Safely boost the background audio track by 10%
-                    subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "+10%"])
-                    # 2. ✨ Pushes a beautiful native floating notification bubble onto your desktop
-                    # Arguments: "App Name", "Main Message Text", "--icon=sound-indicator"
+                    # Using wpctl (WirePlumber standard for modern Ubuntu)
+                    subprocess.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "10%+"])
                     subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Increased [ +10% ]", "--icon=audio-volume-high", "-h", "string:x-canonical-private-synchronous:volume"])
                 return {"status": "success", "msg": "Master speaker matrix boosted."}
                 
@@ -84,16 +88,31 @@ class LunaAPI:
                     import ctypes
                     ctypes.windll.user32.keybd_event(0xAE, 0, 0, 0)
                 else:
-                    # 1. Safely attenuate the background audio track by 10%
-                    subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
-                    # 2. ✨ Pushes the native floating notification bubble onto your desktop
+                    subprocess.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "10%-"])
                     subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
                 return {"status": "success", "msg": "Master speaker matrix attenuated."}
 
+            elif "mute volume" in cmd:
+                if CURRENT_OS == "windows":
+                    import ctypes
+                    ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)
+                else:
+                    subprocess.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "1"])
+                    subprocess.run(["notify-send", "L.U.N.A. Core", "Audio Output Muted", "--icon=audio-volume-muted", "-h", "string:x-canonical-private-synchronous:volume"])
+                return {"status": "success", "msg": "Master speaker muted."}
+
+            elif "unmute" in cmd:
+                if CURRENT_OS == "windows":
+                    import ctypes
+                    ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)       # Key Down (Press)
+                    ctypes.windll.user32.keybd_event(0xAD, 0, 0x0002, 0)  # Key Up (Release)
+                else:
+                    subprocess.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+                    subprocess.run(["notify-send", "L.U.N.A. Core", "Audio Output Active", "--icon=audio-volume-high", "-h", "string:x-canonical-private-synchronous:volume"])
+                return {"status": "success", "msg": "Master speaker unmuted."}            
                 
             elif "lock system" in cmd or "lock screen" in cmd:
                 if CURRENT_OS == "windows":
-                    # Native Windows lock function
                     import ctypes
                     ctypes.windll.user32.LockWorkStation()
                 else:

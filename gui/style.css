@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────
-   🌙 L.U.N.A. BRAND COLOR CONFIGURATION (From Palette)
+    L.U.N.A. BRAND COLOR CONFIGURATION (From Palette)
    ───────────────────────────────────────────────────────── */
 :root {
     --bg-dark-obsidian:  #1d2030; /* The deep navy base coat on the far right */
@@ -151,7 +151,7 @@ textarea::placeholder {
 }
 
 /* ─────────────────────────────────────────────────────────
-   👂 L.U.N.A. ACTIVE LISTENING STATE
+    L.U.N.A. ACTIVE LISTENING STATE
    Transforms the moon into a glowing, vibrant full sphere.
    ───────────────────────────────────────────────────────── */
 .luna-moon.state-listening {

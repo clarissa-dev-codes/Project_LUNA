@@ -105,6 +105,19 @@ function initializeTerminalInput() {
     const terminalFeed = document.getElementById('terminal-feed');
     if (!inputBox || !terminalFeed) return;
 
+    async function sendCommandToPython(rawText) {
+        const timeNow = new Date().toTimeString().split(' ')[0];
+        try {
+            // Secure asynchronous promise call to our Python app.py dispatcher
+            const response = await window.pywebview.api.execute_ui_command(rawText);
+            const logColor = response.status === 'success' ? '#ffffff' : '#948fb0';
+            terminalFeed.innerHTML += `<br><span style="color: var(--text-frosted-lilac);">[${timeNow}] Luna:</span> <span style="color: ${logColor};">${response.msg}</span>`;
+        } catch (err) {
+            terminalFeed.innerHTML += `<br><span style="color: #ff0055;">[System Error]:</span> Python function exception: ${err.message}`;
+        }
+        terminalFeed.scrollTop = terminalFeed.scrollHeight;
+    }
+
     inputBox.addEventListener('keydown', async (event) => {
         if (event.key === 'Enter') {
             const rawText = inputBox.value.trim();
@@ -117,22 +130,15 @@ function initializeTerminalInput() {
             terminalFeed.innerHTML += `<br><span style="color: #7a768f;">[${timeNow}] User:</span> ${rawText}`;
             terminalFeed.scrollTop = terminalFeed.scrollHeight;
 
-            // ✨ THE BRIDGE SAFETY CHECK: Verify that the framework API object exists before calling it
+            // THE BRIDGE SAFETY CHECK: Verify that the framework API object exists before calling it
             if (window.pywebview && window.pywebview.api) {
-                try {
-                    // Call Python dispatcher natively
-                    const response = await window.pywebview.api.execute_ui_command(rawText);
-                    
-                    const logColor = response.status === 'success' ? '#ffffff' : '#948fb0';
-                    terminalFeed.innerHTML += `<br><span style="color: var(--text-frosted-lilac);">[${timeNow}] Luna:</span> <span style="color: ${logColor};">${response.msg}</span>`;
-                } catch (err) {
-                    terminalFeed.innerHTML += `<br><span style="color: #ff0055;">[System Error]:</span> Python function exception: ${err.message}`;
-                }
+                await sendCommandToPython(rawText);
             } else {
-                terminalFeed.innerHTML += `<br><span style="color: #ff0055;">[System Error]:</span> L.U.N.A. API bridge offline. Try restarting.`;
+                window.addEventListener('pywebviewready', async () => {
+                    await sendCommandToPython(rawText);
+                }, { once: true }); // Triggers exactly once when the layer goes live
             }
             terminalFeed.scrollTop = terminalFeed.scrollHeight;
         }
     });
 }
-
