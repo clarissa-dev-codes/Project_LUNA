@@ -1,6 +1,6 @@
 import os
 import sys
-import platform  # Detects if we are running on Windows or Linux
+import platform  # NEW: Detects if we are running on Windows or Linux
 import subprocess
 
 # ─────────────────────────────────────────────────────────
@@ -88,28 +88,12 @@ class LunaAPI:
                     import ctypes
                     ctypes.windll.user32.keybd_event(0xAE, 0, 0, 0)
                 else:
-                    subprocess.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "10%-"])
+                    # 1. Safely attenuate the background audio track by 10%
+                    subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
+                    # 2. ✨ Pushes the native floating notification bubble onto your desktop
                     subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
                 return {"status": "success", "msg": "Master speaker matrix attenuated."}
 
-            elif "mute volume" in cmd:
-                if CURRENT_OS == "windows":
-                    import ctypes
-                    ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)
-                else:
-                    subprocess.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "1"])
-                    subprocess.run(["notify-send", "L.U.N.A. Core", "Audio Output Muted", "--icon=audio-volume-muted", "-h", "string:x-canonical-private-synchronous:volume"])
-                return {"status": "success", "msg": "Master speaker muted."}
-
-            elif "unmute" in cmd:
-                if CURRENT_OS == "windows":
-                    import ctypes
-                    ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)       # Key Down (Press)
-                    ctypes.windll.user32.keybd_event(0xAD, 0, 0x0002, 0)  # Key Up (Release)
-                else:
-                    subprocess.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
-                    subprocess.run(["notify-send", "L.U.N.A. Core", "Audio Output Active", "--icon=audio-volume-high", "-h", "string:x-canonical-private-synchronous:volume"])
-                return {"status": "success", "msg": "Master speaker unmuted."}            
                 
             elif "lock system" in cmd or "lock screen" in cmd:
                 if CURRENT_OS == "windows":
