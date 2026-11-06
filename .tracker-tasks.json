@@ -1,0 +1,109 @@
+{
+    "tasks": [
+        {
+            "id": 1793717798529,
+            "title": "Speech to Text",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717816231,
+            "title": "Mac commands",
+            "status": "In Progress"
+        },
+        {
+            "id": 1793717819181,
+            "title": "add ai",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717822640,
+            "title": "add openclaw",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717829430,
+            "title": "find a voice for LUNA",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717886896,
+            "title": "make local profile config engine",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717906127,
+            "title": "advanced quick-launch mapper registry",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717912376,
+            "title": "local audio chime matrix",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717920387,
+            "title": "standby minimize script manager",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717932887,
+            "title": "local offline ollama model connection",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717942727,
+            "title": "short-term context memory loop",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717952027,
+            "title": "offline speech recognition",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717963427,
+            "title": "native speech synthesis engine for windows",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717972467,
+            "title": "natic speech synthesis engine for linux",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793717982446,
+            "title": "native speech synthesis engine for mac",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793718018140,
+            "title": "make luna's little window for the corner of the screen when the main window is closed",
+            "status": "Backlog"
+        },
+        {
+            "id": 1793718457762,
+            "title": "make mute and unmute for linux",
+            "status": "Done"
+        },
+        {
+            "id": 1793718470613,
+            "title": "make mute and unmute for mac",
+            "status": "In Progress"
+        },
+        {
+            "id": 1793718486582,
+            "title": "make volume controls for mac",
+            "status": "In Progress"
+        },
+        {
+            "id": 1793718493764,
+            "title": "make open code command for mac",
+            "status": "In Progress"
+        },
+        {
+            "id": 1793893047694,
+            "title": "Add graphics to the system box so that it looks better",
+            "status": "Backlog"
+        }
+    ]
+}
