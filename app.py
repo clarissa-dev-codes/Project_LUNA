@@ -48,34 +48,35 @@ class LunaAPI:
         print(f"[OS: {CURRENT_OS.upper()}] Routing action -> {cmd}")
 
         try:
-            # 1. App Launcher Routing
             if "open browser" in cmd or "launch web" in cmd:
                 if CURRENT_OS == "windows":
-                    # Native Windows command to open default browser
                     os.system("start https://google.com")
-                else:
-                    # Native Linux command to open default browser
+                elif CURRENT_OS == "darwin":  # macOS
+                    subprocess.Popen(["open", "https://google.com"])
+                else:  # Linux
                     subprocess.Popen(["xdg-open", "https://google.com"])
                 return {"status": "success", "msg": "Default browser matrix active."}
                 
             elif "open code" in cmd or "launch vscode" in cmd:
                 if CURRENT_OS == "windows":
-                    # Launches VS Code on Windows via shell path
                     subprocess.Popen(["cmd", "/c", "code"], shell=True)
-                else:
+                elif CURRENT_OS == "darwin":  # macOS
+                    # Launches VS Code safely by its macOS application bundle registration name
+                    subprocess.Popen(["open", "-a", "Visual Studio Code"])
+                else:  # Linux
                     subprocess.Popen(["code"])
                 return {"status": "success", "msg": "VS Code workspace opened."}
 
-            # 2. Hardware Control Routing (Universal Linux Audio Update)
+            # ── 2. HARDWARE CONTROL SUBSYSTEM (Audio Management) ──
             elif "volume up" in cmd:
                 if CURRENT_OS == "windows":
                     import ctypes
                     ctypes.windll.user32.keybd_event(0xAF, 0, 0, 0)
-                else:
-                    # 1. Safely boost the background audio track by 10%
-                    subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "+10%"])
-                    # 2. ✨ Pushes a beautiful native floating notification bubble onto your desktop
-                    # Arguments: "App Name", "Main Message Text", "--icon=sound-indicator"
+                elif CURRENT_OS == "darwin":  # macOS
+                    # Uses AppleScript to natively boost output metrics smoothly by ~6% increments
+                    subprocess.run(["osascript", "-e", "set volume output volume ((output volume of (get volume settings)) + 6)"])
+                else:  # Linux
+                    subprocess.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "10%+"])
                     subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Increased [ +10% ]", "--icon=audio-volume-high", "-h", "string:x-canonical-private-synchronous:volume"])
                 return {"status": "success", "msg": "Master speaker matrix boosted."}
                 
@@ -83,46 +84,52 @@ class LunaAPI:
                 if CURRENT_OS == "windows":
                     import ctypes
                     ctypes.windll.user32.keybd_event(0xAE, 0, 0, 0)
-                else:
-                    # 1. Safely attenuate the background audio track by 10%
-                    subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
-                    # 2.  Pushes the native floating notification bubble onto your desktop
+                elif CURRENT_OS == "darwin":  # macOS
+                    subprocess.run(["osascript", "-e", "set volume output volume ((output volume of (get volume settings)) - 6)"])
+                else:  # Linux
+                    subprocess.run(["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "10%-"])
                     subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
                 return {"status": "success", "msg": "Master speaker matrix attenuated."}
 
-            elif "mute volume" in cmd:
-                            if CURRENT_OS == "windows":
-                                import ctypes
-                                ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)
-                        #    else:
-                                # 1. Safely attenuate the background audio track by 10%
-                        #        subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
-                                # 2. Pushes the native floating notification bubble onto your desktop
-                        #      subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
-                            return {"status": "success", "msg": "Master speaker muted."}
+            elif "unmute volume" in cmd or "unmute" in cmd:
+                if CURRENT_OS == "windows":
+                    import ctypes
+                    ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)
+                    ctypes.windll.user32.keybd_event(0xAD, 0, 0x0002, 0)
+                elif CURRENT_OS == "darwin":  # macOS
+                    # Deactivates the system output mute configuration layer
+                    subprocess.run(["osascript", "-e", "set volume without output muted"])
+                else:  # Linux
+                    subprocess.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"])
+                    subprocess.run(["notify-send", "L.U.N.A. Core", "Audio Output Active", "--icon=audio-volume-high", "-h", "string:x-canonical-private-synchronous:volume"])
+                return {"status": "success", "msg": "Master speaker unmuted."}   
 
-            elif "unmute volume" in cmd:
-                            if CURRENT_OS == "windows":
-                                import ctypes
-                                ctypes.windll.user32.keybd_event(0xAD, 0, 2, 0)
-                            #    else:
-                                # 1. Safely attenuate the background audio track by 10%
-                            #        subprocess.run(["pactl", "set-sink-volume", "@DEFAULT_SINK@", "-10%"])
-                                # 2.  Pushes the native floating notification bubble onto your desktop
-                            #      subprocess.run(["notify-send", "L.U.N.A. Core", "Volume Decreased [ -10% ]", "--icon=audio-volume-low", "-h", "string:x-canonical-private-synchronous:volume"])
-                                return {"status": "success", "msg": "Master speaker unmuted."}            
-
+            elif "mute volume" in cmd or "mute" in cmd:
+                if CURRENT_OS == "windows":
+                    import ctypes
+                    ctypes.windll.user32.keybd_event(0xAD, 0, 0, 0)
+                    ctypes.windll.user32.keybd_event(0xAD, 0, 0x0002, 0)
+                elif CURRENT_OS == "darwin":  # macOS
+                    # Forces the internal core audio mixer configuration output to true mute
+                    subprocess.run(["osascript", "-e", "set volume with output muted"])
+                else:  # Linux
+                    subprocess.run(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "1"])
+                    subprocess.run(["notify-send", "L.U.N.A. Core", "Audio Output Muted", "--icon=audio-volume-muted", "-h", "string:x-canonical-private-synchronous:volume"])
+                return {"status": "success", "msg": "Master speaker muted."}         
                 
+            # ── 3. WORKSTATION SECURITY SUBSYSTEM ──
             elif "lock system" in cmd or "lock screen" in cmd:
                 if CURRENT_OS == "windows":
-                    # Native Windows lock function
                     import ctypes
                     ctypes.windll.user32.LockWorkStation()
-                else:
+                elif CURRENT_OS == "darwin":  # macOS
+                    # Triggers the official macOS login window framework process to slide into view instantly
+                    subprocess.run(["open", "-a", "ScreenSaverEngine"])
+                else:  # Linux
                     subprocess.run(["xdg-screensaver", "lock"])
                 return {"status": "success", "msg": "Security protocols active. Workstation locked."}
 
-            return {"status": "unknown", "msg": f"Command vector '{raw_command}' not recognized."}
+            # ── 4. DIRECTORY AUTOMATION SUBSYSTEM ──
 
         except Exception as e:
             return {"status": "error", "msg": f"Universal execution failure: {str(e)}"}
