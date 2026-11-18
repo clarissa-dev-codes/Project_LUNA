@@ -1,6 +1,6 @@
 import os
 import sys
-import platform  # NEW: Detects if we are running on Windows or Linux
+import platform  # Detects if we are running on Windows or Linux
 import subprocess
 
 # MULTI-PLATFORM ENVIRONMENTAL HANDLING
@@ -17,6 +17,22 @@ import time
 import psutil
 import webview
 import threading
+
+# ♥─────────────────────────────────────────────♥
+#   Pyintaller resource and save path helpers
+# ♥─────────────────────────────────────────────♥
+def get_resource_path(relative_path):
+    """Finds bundled assets (like the gui folder) inside PyInstaller."""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
+
+def get_app_dir():
+    """Finds the permanent folder where the app lives so scratchpad.txt persists."""
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
 
 class LunaAPI:
     def send_to_terminal(self, text):
@@ -156,7 +172,7 @@ def track_hardware_metrics(window):
 
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    gui_dir = os.path.join(current_dir, 'gui', 'index.html')
+    gui_dir = get_resource_path(os.path.join('gui', 'index.html'))
     api = LunaAPI()
     
     window = webview.create_window(
