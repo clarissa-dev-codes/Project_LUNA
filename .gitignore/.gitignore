@@ -1,0 +1,12 @@
+# Local user data & personal settings
+scratchpad.txt
+config.json
+
+# PyInstaller build artifacts (keep heavy compiled binaries out of Git)
+build/
+dist/
+*.spec
+
+# Python cache files
+__pycache__/
+*.py[cod]
