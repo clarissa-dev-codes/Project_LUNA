@@ -9,6 +9,7 @@ CURRENT_OS = platform.system().lower()  # Returns 'windows' or 'linux'
 if CURRENT_OS == 'linux':
     # Clean out leaked Snap paths if launching from a sandboxed tool on Ubuntu
     keys_to_purge = ['LD_PRELOAD', 'GTK_PATH', 'LD_LIBRARY_PATH', 'BASH_FUNC_which%%']
+    os.environ['WEBKIT_DISABLE_COMPOSITING_MODE'] = '1' #prevents webkit from losing GPU surface context for Ubuntu
     for key in keys_to_purge:
         os.environ.pop(key, None)
     os.environ['GDK_BACKEND'] = 'x11'
@@ -154,6 +155,10 @@ def track_hardware_metrics(window):
     time.sleep(2) 
     while True:
         try:
+            #makes sure the window still exists before it sends anything
+            if not window or window not in webview.windows:
+                break
+
             current_url = window.get_current_url()
             if not current_url or "about:blank" in current_url:
                 time.sleep(0.5)
@@ -164,11 +169,16 @@ def track_hardware_metrics(window):
             battery_info = psutil.sensors_battery()
             battery = int(battery_info.percent) if battery_info else "100"
 
-            js_code = f"updateHardwareMetrics({cpu}, {ram}, '{battery}');"
+            js_code = f"if(window.updateHardwareMetrics) {{ window.updateHardwareMetrics({cpu}, {ram}, '{battery}'); }}"
             window.evaluate_js(js_code)
+
         except Exception as e:
+            #should pause longer if the screen is locked or webkit is temp. suspended
+            time.sleep(5)
             print(f"Metrics tracking error: {e}")
-        time.sleep(1)
+
+
+        time.sleep(2) #changed to 2s to prevent GTK thread queue congestion during idle
 
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
