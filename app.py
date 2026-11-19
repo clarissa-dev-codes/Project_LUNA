@@ -2,6 +2,7 @@ import os
 import sys
 import platform  # Detects if we are running on Windows or Linux
 import subprocess
+import json #to save everything so that it doesn't go in a temp folder and disappear
 
 # MULTI-PLATFORM ENVIRONMENTAL HANDLING
 CURRENT_OS = platform.system().lower()  # Returns 'windows' or 'linux'
@@ -36,6 +37,65 @@ def get_app_dir():
 
 
 class LunaAPI:
+    #to save the config.json permantely
+    def __init__(self):
+        self.config_path = os.path.join(get_app_dir(), 'config.json')
+        self.intitialize_default_config()
+
+    def initialize_default_config(self):
+        #make if not there (default)
+        if not os.path.exists(self.config_path):
+            default_config = {
+                "user_preferences": {
+                    "title": "Ma'am",
+                    "theme": "slate-lavender"
+                },
+                "custom_apps": {
+                    "open github": {
+                        "windows": "start https://github.com",
+                        "linux": "xdg-open https://github.com",
+                        "darwin": "open https://github.com"
+                    }
+                },
+                "ai_configuration": {
+                    "active_provider": "none",
+                    "providers": {
+                        "ollama": {
+                            "host_url": "http://localhost:11434",
+                            "model_name": "llama3.2:3b"
+                        },
+                        "open_claw": {
+                            "endpoint_url": "http://localhost:8000/v1"
+                        },
+                        "cloud_api": {
+                            "api_key": "",
+                            "model_name": ""
+                        }
+                    }
+                }
+            }
+            with open(self.config_path, 'w', encoding='utf-8') as f:
+                json.dump(default_config, f, indent=4)
+
+    #reads and returns what's in the config file
+    def get_config(self):
+        try:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error reading config.json: {e}")
+            return {}
+        
+    #writes the updated stuff to the json file
+    def save_config(self, data):
+        try: 
+            with open(self.config_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=4)
+            return True
+        except Exception as e:
+                print(f"Error saving config.json: {e}")
+                return False
+
     def send_to_terminal(self, text):
         print(f"[UI Log]: {text}")
         return "Acknowledged, ma'am."
@@ -62,9 +122,36 @@ class LunaAPI:
     # ─────────────────────────────────────────────────────────
     def execute_ui_command(self, raw_command):
         cmd = raw_command.lower().strip()
+        config = self.get_config()
+        user_title = config.get("user_preferences", {}).get("title", "Ma'am")
+
         print(f"[OS: {CURRENT_OS.upper()}] Routing action -> {cmd}")
 
         try:
+            if cmd.startswith("call me "):
+                new_title = raw_command[8:].strip()
+                if not new_title:
+                    return {"status": "error", "msg": f"Please specify a name or title, {user_title}."}
+                config["user_preferences"]["title"] = new_title
+                self.save_config(config)
+                return {"status": "success", "msg": f"Preferences updated. I will address you as {new_title} from now on."}
+            elif cmd.startswith("set brain "):
+                provider = cmd[10:].strip()
+                valid_providers = config.get("ai_configuration", {}).get("providers", {}).keys()
+                if provider not in valid_providers and provider != "none":
+                    return {"status": "error", "msg": f"Unknown provider '{provider}'. Available: {', '.join(valid_providers)}, or none."}
+                config["ai_configuration"]["active_provider"] = provider
+                self.save_config(config)
+                return {"status": "success", "msg": f"AI provider switched to '{provider}', {user_title}."}
+
+            custom_apps = config.get("custom_apps", {})
+            if cmd in custom_apps:
+                os_cmd = custom_apps[cmd].get(CURRENT_OS)
+                if os_cmd:
+                    subprocess.Popen(os_cmd, shell=True)
+                    return {"status": "success", "msg": f"Executing custom shortcut '{cmd}', {user_title}."}
+                return {"status": "error", "msg": f"No command mapped for {CURRENT_OS} under '{cmd}'."}
+
             if "open browser" in cmd or "launch web" in cmd:
                 if CURRENT_OS == "windows":
                     os.system("start https://google.com")
@@ -147,6 +234,11 @@ class LunaAPI:
                 return {"status": "success", "msg": "Security protocols active. Workstation locked."}
 
             # ── 4. DIRECTORY AUTOMATION SUBSYSTEM ──
+
+            active_brain = config.get("ai_configuration", {}).get("active_provider", "none")
+            if active_brain != "none":
+                return {"status": "success", "msg": f"[{active_brain.upper()} Adapter]: Brain routing ready for '{raw_command}', {user_title}."}
+            return {"status": "unknown", "msg": f"Command '{raw_command}' not recognized, {user_title}."}
 
         except Exception as e:
             return {"status": "error", "msg": f"Universal execution failure: {str(e)}"}

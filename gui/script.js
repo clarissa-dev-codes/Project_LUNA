@@ -12,11 +12,22 @@ function setupMoonInteraction() {
 
     let isListening = false;
 
-    moonCore.addEventListener('click', () => {
+    moonCore.addEventListener('click', async() => {
         isListening = !isListening;
 
         // Generate a localized clean timestamp
         const timeNow = new Date().toTimeString().split(' ')[0];
+
+        //gets saved title
+        let userTitle = "Ma'am";
+        if (window.pywebview && window.pywebview.api){
+            try{
+                const config = await window.pywebview.api.get_config();
+                if (config && config.user_preferences && config.user_preferences.title){
+                    userTitle = config.user_preferences.title;
+                }
+            } catch (err) {}
+        }
 
         if (isListening) {
             // Switch classes to fire off the active listening pulse animation
